@@ -132,7 +132,7 @@ module Juggernaut
         
         opts.separator ""; opts.separator "Permissions:"
         
-        opts.on("-u", "--user USER", String, "User to run as") do |user|
+        opts.on("-u", "--user USER", Integer, "User to run as") do |user|
           options[:user] = user
         end
 
