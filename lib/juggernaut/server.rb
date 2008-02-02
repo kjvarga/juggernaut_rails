@@ -329,7 +329,7 @@ module Juggernaut
       end
       
       def authenticate_broadcast_or_query
-        if options[:allowed_ips] and peername = get_peername
+        if options[:allowed_ips]
           return true if options[:allowed_ips].include?(client_ip)
         elsif !request[:secret_key]
           return true if broadcast_query_request
