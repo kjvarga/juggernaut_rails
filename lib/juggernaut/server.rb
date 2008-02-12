@@ -331,10 +331,10 @@ module Juggernaut
       def authenticate_broadcast_or_query
         if options[:allowed_ips]
           return true if options[:allowed_ips].include?(client_ip)
-        elsif !request[:secret_key]
+        elsif !@request[:secret_key]
           return true if broadcast_query_request
         elsif options[:secret_key]
-          return true if request[:secret_key] == @options[:secret_key]
+          return true if @request[:secret_key] == @options[:secret_key]
         end
         if !options[:allowed_ips] and !options[:secret_key] and !options[:broadcast_query_login_url]
           return true
