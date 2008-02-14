@@ -69,7 +69,7 @@ module Juggernaut
     # so we need to buffer the data until we find the
     # terminating "\0"
     def receive_data(data)
-      logger.debug "Receiving data: #{data}"
+      logger.debug "Receiving data: #{data.inspect}"
       @buffer << data
       @buffer = process_whole_messages(@buffer)
     end
