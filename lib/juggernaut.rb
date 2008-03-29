@@ -104,6 +104,10 @@ module Juggernaut
 
      # Port is mandatory
      :port: 5001
+     
+     # Defaults to value of :port. If you are doing port forwarding you'll need to configure this to the same 
+     # value as :public_port in the juggernaut_hosts.yml file
+     # :public_port: 5001
 
    EOF
 

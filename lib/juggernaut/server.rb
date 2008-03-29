@@ -95,7 +95,7 @@ module Juggernaut
       
       if ln == POLICY_REQUEST
         logger.debug "Sending crossdomain file"
-        send_data POLICY_FILE.gsub('PORT', options[:port].to_s)
+        send_data POLICY_FILE.gsub('PORT', (options[:public_port]||options[:port]).to_s)
         close_connection_after_writing
         return
       end
