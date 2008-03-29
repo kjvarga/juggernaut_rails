@@ -69,7 +69,7 @@ module Juggernaut
     # so we need to buffer the data until we find the
     # terminating "\0"
     def receive_data(data)
-      logger.debug "Receiving data: #{data.inspect}"
+      logger.debug "Receiving data: #{data}"
       @buffer << data
       @buffer = process_whole_messages(@buffer)
     end
@@ -110,6 +110,9 @@ module Juggernaut
       
       @request.symbolize_keys!
       
+      # For debugging
+      @request[:ip] = client_ip
+      
       @request[:channels] = (@request[:channels] || []).compact.select {|c| !!c && c != '' }.uniq
       
       if @request[:client_ids] 
@@ -121,15 +124,15 @@ module Juggernaut
         when :subscribe: subscribe_command
         when :query:     query_command
       else
-        raise InvalidCommand, @request[:command]
+        raise InvalidCommand, @request
       end
     
     rescue JuggernautError => e
-      logger.error e
+      logger.error("#{e} - #{e.message.inspect}")
       close_connection
-    # # So as to stop em quitting
-    # rescue => e
-    #   logger ? logger.error(e) : puts(e)
+    # So as to stop em quitting
+    rescue => e
+      logger ? logger.error(e) : puts(e)
     end
     
     def unbind
@@ -273,7 +276,7 @@ module Juggernaut
             query_needs :channels
             publish Juggernaut::Client.find_by_channels(@request[:channels]).to_json
         else
-          raise MalformedQuery, @request[:type]
+          raise MalformedQuery, @request
         end
       end
     
@@ -312,19 +315,19 @@ module Juggernaut
       
       def broadcast_needs(*args)
         args.each do |arg|
-          raise MalformedBroadcast unless @request.has_key?(arg)
+          raise MalformedBroadcast, @request unless @request.has_key?(arg)
         end
       end
       
       def subscribe_needs(*args)
         args.each do |arg|
-          raise MalformedSubscribe unless @request.has_key?(arg)
+          raise MalformedSubscribe, @request unless @request.has_key?(arg)
         end
       end
       
       def query_needs(*args)
         args.each do |arg|
-          raise MalformedQuery unless @request.has_key?(arg)
+          raise MalformedQuery, @request unless @request.has_key?(arg)
         end
       end
       
