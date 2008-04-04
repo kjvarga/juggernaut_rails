@@ -337,7 +337,7 @@ module Juggernaut
         elsif !@request[:secret_key]
           return true if broadcast_query_request
         elsif options[:secret_key]
-          return true if @request[:secret_key] == @options[:secret_key]
+          return true if @request[:secret_key] == options[:secret_key]
         end
         if !options[:allowed_ips] and !options[:secret_key] and !options[:broadcast_query_login_url]
           return true
