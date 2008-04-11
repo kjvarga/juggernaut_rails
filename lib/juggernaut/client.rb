@@ -145,9 +145,10 @@ module Juggernaut
        params << "session_id=#{session_id}" if session_id
        channels.each {|chan| params << "channels[]=#{chan}" }
        url.query = params.join('&')
-       begin
+       begin         
          open(url.to_s, "User-Agent" => "Ruby/#{RUBY_VERSION}")
-       rescue
+       rescue => e
+         logger.debug("Bad response from #{url.to_s}: #{e}")
          return false
        end
        true

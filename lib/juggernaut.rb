@@ -1,3 +1,4 @@
+require 'rubygems'
 require 'logger'
 require 'eventmachine'
 require 'json'
