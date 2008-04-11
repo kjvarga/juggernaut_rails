@@ -68,6 +68,7 @@ module Juggernaut
         new_size = EM.set_descriptor_table_size( options[:descriptor_table_size] )
         logger.debug "New descriptor-table size is #{new_size}"
       end
+      
       EventMachine::run {
         EventMachine::add_periodic_timer( options[:cleanup_timer].to_i ) { Juggernaut::Client.send_logouts_after_timeout }
         EventMachine::start_server(options[:host], options[:port].to_i, Juggernaut::Server)
@@ -112,7 +113,7 @@ module Juggernaut
           options[:port] = v
         end
 
-        opts.on("-s", "--fdsize FILE_DESCRIPTOR_SIZE", Integer, "Set the file descriptor size an user epoll() on Linux", "(default: use select() which is limited to 1024 clients") do |v|
+        opts.on("-s", "--fdsize SIZE", Integer, "Set the file descriptor size an user epoll() on Linux", "(default: use select() which is limited to 1024 clients)") do |v|
           options[:descriptor_table_size] = v
         end
         
