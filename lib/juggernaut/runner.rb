@@ -127,7 +127,7 @@ module Juggernaut
           options[:daemonize] = v
         end
 
-        opts.on("-k", "--kill PORT", String, "Kill specified running daemons - leave blank to kill all.") do |v|
+        opts.on("-k", "--kill PORT", String, :OPTIONAL, "Kill specified running daemons - leave blank to kill all.") do |v|
           options[:kill] = v
         end
         
