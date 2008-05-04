@@ -357,6 +357,8 @@ module Juggernaut
         url.query = params.join('&')
         begin
           open(url.to_s, "User-Agent" => "Ruby/#{RUBY_VERSION}")
+        rescue Timeout::Error
+          return false
         rescue
           return false
         end
