@@ -52,15 +52,7 @@ module Juggernaut
     attr_reader   :logout_timeout
     attr_reader   :status
     attr_reader   :channels
-    
-    @@client_messages = Hash.new do |clients, client_id|
-      clients[client_id] = Hash.new do |channels, channel|
-        channels[channel] = Array.new
-      end
-    end
-    
-    @@last_timeout = Time.now
-    
+
     # EM methods
     
     def post_init
@@ -304,28 +296,6 @@ module Juggernaut
         if options[:store_messages]
           broadcast_all_messages_from(@request[:last_msg_id], @request[:signature])
         end
-        
-        if options[:store_client_messages]
-          channels.each do |channel|
-            messages = @@client_messages[@client.id][channel]
-            messages.each do |msg|
-              publish(msg)
-            end
-            @@client_messages[@client.id].delete(channel)
-            @@client_messages.delete(@client.id) if @@client_messages[@client.id].empty?
-          end
-          if options[:client_message_timeout]
-            timeout_period = options[:client_message_timeout]
-            if timeout_period.nil?
-              timeout_period = options[:client_message_timeout].to_i
-            else
-              timeout_period = options[:client_message_timeout_period].to_i
-            end
-            if @@last_timeout <= (Time.now - timeout_period)
-              timeout_client_messages
-            end
-          end
-        end
       end
     
     private
@@ -337,14 +307,8 @@ module Juggernaut
       end
       
       def broadcast_to_client(body, client_id, channels)
-        if client = Juggernaut::Client.find_by_id(client_id)
-          client.send_message(body, channels)
-        elsif options[:store_client_messages]
-          logger.info "Storing Message for Client #{client_id}"
-          channels.each do |channel|
-            @@client_messages[client_id][channel] << Juggernaut::Message.new(@current_msg_id += 1, body, self.signature)
-          end
-        end
+        client = Juggernaut::Client.find_by_id(client_id)
+        client.send_message(body, channels) if client
       end
       
       # Helper methods
@@ -403,20 +367,6 @@ module Juggernaut
       
       def client_ip
         Socket.unpack_sockaddr_in(get_peername)[1]
-      end
-      
-      def timeout_client_messages
-        if timeout = options[:client_message_timeout]
-          logger.info "Timing out old messages"
-          @@client_messages.each do |client_id, channels|
-            channels.each do |channel, messages|
-              messages.reject! { |msg| msg.created_at <= (Time.now - timeout.to_i) }
-              channels.delete(channel) if messages.empty?
-            end
-            @@client_messages.delete(client_id) if channels.empty?
-          end
-          @@last_timeout = Time.now
-        end
       end
   end
 end
