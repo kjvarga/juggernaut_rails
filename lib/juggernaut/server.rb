@@ -350,7 +350,7 @@ module Juggernaut
         url = URI.parse(options[:broadcast_query_login_url])
         params = []
         params << "client_id=#{@request[:client_id]}" if @request[:client_id]
-        params << "session_id=#{@request[:session_id]}" if @request[:session_id]
+        params << "session_id=#{URI.escape(@request[:session_id])}" if @request[:session_id]
         params << "type=#{@request[:type]}"
         params << "command=#{@request[:command]}"
         (@request[:channels] || []).each {|chan| params << "channels[]=#{chan}" }
