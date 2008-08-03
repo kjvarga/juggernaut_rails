@@ -31,7 +31,7 @@ module Juggernaut
       parse_options
       
       if !File.exists?(config_path)
-        puts "You must generate a config file (juggernaut -g)"
+        puts "You must generate a config file (juggernaut -g filename.yml)"
         exit
       end
       
