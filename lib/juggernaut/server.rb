@@ -272,7 +272,7 @@ module Juggernaut
           when :show_user
             query_needs :client_id
             publish Juggernaut::Client.find_by_id(@request[:client_id]).to_json
-          when :show_users_for_channel
+          when :show_users_for_channels
             query_needs :channels
             publish Juggernaut::Client.find_by_channels(@request[:channels]).to_json
         else
