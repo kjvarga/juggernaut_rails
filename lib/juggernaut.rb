@@ -5,7 +5,7 @@ require 'json'
 $:.unshift(File.dirname(__FILE__))
 
 module Juggernaut
-  VERSION   = '0.5.6'
+  VERSION   = '0.5.7'
 
   class JuggernautError < StandardError #:nodoc:
   end
