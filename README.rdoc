@@ -1,0 +1,95 @@
+Juggernaut
+    by Alex MacCaw http://www.eribium.org
+    minor fixes and unit tests by Ripta Pasay
+    bundled by Karl Varga
+
+== ABOUT
+
+I've created this Gem to simplify the Juggernaut installation process and to improve its integration with Rails.  Previously you needed to install both the Juggernaut Gem and the Rails plugin, and things like log paths just weren't following Rails conventions.
+
+This Gem includes Rake tasks for starting and stopping the Jug server and allows Jug server configurations based on the Rails environment, as well as better support for jQuery.  For instance when we deploy to production we use Capistrano so we want our production PID to be in the <tt>shared/pids/</tt> directory, while in development we stick with the default: <tt>tmp/pids/</tt>.  Now your <tt>config/juggernaut.yml</tt> configuration can handle that.
+
+At the time of writing (Oct 29 2009) this Gem is based on (the latest) version 0.5.8 of Alex MacCaw's Gem and includes the latest <tt>juggernaut_plugin</tt>.
+
+== INSTALL
+
+Install the gem
+
+  # This requires GemCutter.  To get started with GemCutter:
+  #  gem install gemcutter
+  #  gem tumble
+  gem install juggernaut_rails
+
+Now add the gem to your application and include Juggernaut's Rake tasks in your app's Rakefile:
+
+  # config/environment.rb
+  config.gem 'juggernaut_rails', :lib => 'juggernaut'
+
+  # Rakefile
+  begin
+    require 'juggernaut/rails/tasks'
+  rescue Exception => e
+    puts "Warning, couldn't load gem tasks: #{e.message}! Skipping..."
+  end
+
+Copy the required media files into your application:
+
+  rake juggernaut:install
+
+If you are using jQuery, you will need the jQuery JS files as well:
+
+  rake juggernaut:install:jquery
+
+Include the Juggernaut scripts in your layout and create a simple Jug view:
+
+  # app/views/layout/application.html.erb
+  <%= javascript_include_tag :defaults, :juggernaut %>
+  
+  # If you're using jQuery (note: the jQuery library is not included in Juggernaut's install)
+  # <%= javascript_include_tag 'jquery', :juggernaut_jquery %>
+  
+  # app/views/your/view.html.erb
+  <%= juggernaut %>
+    
+Start your Juggernaut server.  To control the server use these Rake tasks:
+
+  rake juggernaut:start
+  rake juggernaut:stop
+
+Start your Rails application, open your browser and visit the view we created earlier.
+Now in your <tt>script/console</tt> execute the following:
+
+  Juggernaut.send_to_all("alert('hi from juggernaut')") 
+
+You should get the alert message in your browser, or in the console log if you are using FireFox's FireBug.
+  
+Take a look at the configuration options in <tt>config/juggernaut.yml</tt> and <tt>config/juggernaut_hosts.yml</tt>.  Look at your debugging log output in <tt>log/juggernaut.log</tt> and the PID of the running Jug server in <tt>tmp/pids/juggernaut.5001.pid</tt>.  By default debugging is turned on when running in <tt>development</tt> mode.
+  
+== DESCRIPTION:
+See Plugin README:
+    http://juggernaut.rubyforge.org/svn/trunk/juggernaut/README
+
+== LICENSE:
+
+(The MIT License)
+
+Copyright (c) 2008 Alex MacCaw
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+'Software'), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

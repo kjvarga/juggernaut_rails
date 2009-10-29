@@ -1,19 +1,25 @@
-# -*- ruby -*-
-
 require 'rubygems'
-require 'hoe'
-require './lib/juggernaut.rb'
+require 'rake'
 
-Hoe.new('juggernaut', Juggernaut::VERSION) do |p|
-  p.rubyforge_name = 'juggernaut'
-  p.author = 'Alex MacCaw'
-  p.email = 'info@eribium.org'
-  # p.summary = 'FIX'
-  # p.description = p.paragraphs_of('README.txt', 2..5).join("\n\n")
-  p.url = 'http://juggernaut.rubyforge.org'
-  p.changes = p.paragraphs_of('History.txt', 0..1).join("\n\n")
-  p.extra_deps << ['eventmachine', '>=0.10.0']
-  p.extra_deps << ['json', '>=1.1.2']
+begin
+  require 'jeweler'
+  Jeweler::Tasks.new do |gemspec|
+    gemspec.name = "juggernaut_rails"
+    gemspec.summary = "A push server written in Ruby with Rails integration."
+    gemspec.email = "info@eribium.org"
+    gemspec.homepage = "http://juggernaut.rubyforge.org"
+    gemspec.rubyforge_project = 'juggernaut'
+    gemspec.description = <<-END
+      The Juggernaut Gem for Ruby on Rails aims to revolutionize your Rails app by letting the server initiate a connection and push data to the client. In other words your app can have a real time connection to the server with the advantage of instant updates. Although the obvious use of this is for chat, the most exciting prospect for me is collaborative cms and wikis.
+      END
+    gemspec.authors = ["Alex MacCaw"]
+    gemspec.require_paths = ['lib', 'lib/juggernaut']
+    gemspec.files = FileList['[A-Z]*',
+                       '{bin,lib,media,rails,test,rails}/**/*']
+    gemspec.add_dependency 'eventmachine', '>= 0.10.0'
+    gemspec.add_dependency 'json', '>= 1.1.2'  
+  end
+  Jeweler::GemcutterTasks.new
+rescue LoadError
+  puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
 end
-
-# vim: syntax=Ruby
