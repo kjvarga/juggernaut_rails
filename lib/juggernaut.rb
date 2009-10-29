@@ -5,8 +5,8 @@ require 'json'
 $:.unshift(File.dirname(__FILE__))
 
 module Juggernaut
-  VERSION   = '0.5.7'
-
+  VERSION   = '0.5.8'
+  
   class JuggernautError < StandardError #:nodoc:
   end
 
@@ -110,38 +110,43 @@ module Juggernaut
      # value as :public_port in the juggernaut_hosts.yml file
      # :public_port: 5001
 
-   EOF
+  EOF
 
-   class << self
-      def options
-       @@options
-      end
-
-      def options=(val)
-        @@options = val
-      end
-
-      def logger
-        return @@logger if defined?(@@loggger)
-        FileUtils.mkdir_p(File.dirname(log_path))
-        @@logger = Logger.new(log_path)
-        @@logger.level = Logger::INFO if options[:debug] == false
-        @@logger
-      rescue
-        @@logger = Logger.new(STDOUT)
-      end
+  class << self
+    def options
+      @@options
+    end
     
-      def log_path
-        options[:log_path] || File.join(%w( / var run juggernaut.log ))
-      end
+    def options=(val)
+      @@options = val
+    end
     
-      def pid_path
-        options[:pid_path] || File.join(%w( / var run ), "juggernaut.#{options[:port]}.pid" )
-      end
+    def logger
+      return @@logger if defined?(@@logger) && !@@logger.nil?
+      FileUtils.mkdir_p(File.dirname(log_path))
+      @@logger = Logger.new(log_path)
+      @@logger.level = Logger::INFO if options[:debug] == false
+      @@logger
+    rescue
+      @@logger = Logger.new(STDOUT)
+    end
+    
+    def logger=(logger)
+      @@logger = logger
+    end
+    
+    def log_path
+      options[:log_path] || File.join(%w( / var run juggernaut.log ))
+    end
+    
+    def pid_path
+      options[:pid_path] || File.join(%w( / var run ), "juggernaut.#{options[:port]}.pid" )
+    end
       
-      def config_path
-        options[:config_path] || File.join(%w( / var run juggernaut.yml ))
-      end
+    def config_path
+      options[:config_path] || File.join(%w( / var run juggernaut.yml ))
+    end
+    
   end
 end
 

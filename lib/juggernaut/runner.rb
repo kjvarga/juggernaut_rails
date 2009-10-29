@@ -7,12 +7,12 @@ module Juggernaut
     include Juggernaut::Miscel
     
     class << self
-      def run
-        self.new
+      def run(argv = ARGV)
+        self.new(argv)
       end
     end
     
-    def initialize
+    def initialize(argv = ARGV)
       self.options = {
         :host => "0.0.0.0",
         :port => 5001,
@@ -28,14 +28,16 @@ module Juggernaut
         :config_path => config_path
       })
       
-      parse_options
+      parse_options(argv)
       
       if !File.exists?(config_path)
-        puts "You must generate a config file (juggernaut -g filename.yml)"
+        puts "You must generate a config file (juggernaut -g filename.yml or rake juggernaut:install)"
         exit
       end
       
-      options.merge!(YAML::load(ERB.new(IO.read(config_path)).result))
+      config_options = YAML::load(ERB.new(IO.read(config_path)).result)
+      config_options = config_options[::Rails.env] if config_options.has_key?(::Rails.env)
+      options.merge!(config_options)
       
       if options.include?(:kill)
         kill_pid(options[:kill] || '*')
@@ -52,7 +54,7 @@ module Juggernaut
     end
     
     def start
-      puts "Starting Juggernaut server on port: #{options[:port]}..."
+      puts "Starting Juggernaut server #{Juggernaut::VERSION} on port: #{options[:port]}..."
       
       trap("INT") {
         stop
@@ -70,7 +72,7 @@ module Juggernaut
       end
       
       EventMachine::run {
-        EventMachine::add_periodic_timer( options[:cleanup_timer].to_i ) { Juggernaut::Client.send_logouts_after_timeout }
+        EventMachine::add_periodic_timer( options[:cleanup_timer] || 2 ) { Juggernaut::Client.send_logouts_after_timeout }
         EventMachine::start_server(options[:host], options[:port].to_i, Juggernaut::Server)
         EM.set_effective_user( options[:user] ) if options[:user]
       }
@@ -82,7 +84,7 @@ module Juggernaut
       EventMachine::stop
     end
     
-    def parse_options
+    def parse_options(argv)
       OptionParser.new do |opts|
         opts.summary_width = 25
         opts.banner = "Juggernaut (#{VERSION})\n\n",
@@ -162,7 +164,7 @@ module Juggernaut
           puts "Juggernaut #{VERSION}"
           exit
         end
-      end.parse!
+      end.parse!(argv)
       options
     end
     

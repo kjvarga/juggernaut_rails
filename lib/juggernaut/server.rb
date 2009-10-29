@@ -52,13 +52,14 @@ module Juggernaut
     attr_reader   :logout_timeout
     attr_reader   :status
     attr_reader   :channels
+    attr_reader   :client
 
     # EM methods
     
     def post_init
       logger.debug "New client [#{client_ip}]"
+      @client         = nil
       @channels       = []
-      @messages       = []
       @current_msg_id = 0
       @connected      = true
       @logout_timeout = nil
@@ -69,7 +70,6 @@ module Juggernaut
     # so we need to buffer the data until we find the
     # terminating "\0"
     def receive_data(data)
-      logger.debug "Receiving data: #{data}"
       @buffer << data
       @buffer = process_whole_messages(@buffer)
     end
@@ -120,9 +120,14 @@ module Juggernaut
       end
       
       case @request[:command].to_sym
-        when :broadcast: broadcast_command
-        when :subscribe: subscribe_command
-        when :query:     query_command
+        when :broadcast
+          broadcast_command
+        when :subscribe
+          subscribe_command
+        when :query
+          query_command
+        when :noop
+          noop_command
       else
         raise InvalidCommand, @request
       end
@@ -136,16 +141,18 @@ module Juggernaut
     end
     
     def unbind
-      @client.logout_connection_request(@channels) if @client # todo - should be called after timeout?
-      logger.debug "Lost client: #{@client.id}" if @client
+      if @client
+        # todo - should be called after timeout?
+        @client.logout_connection_request(@channels)
+        logger.debug "Lost client #{@client.friendly_id}"
+      end
       mark_dead('Unbind called')
     end
     
     # As far as I'm aware, send_data
     # never throws an exception
     def publish(msg)
-      logger.debug "Sending msg: #{msg.to_s}"
-      logger.debug "To client: #{@client.id}" if @client
+      logger.debug "Sending msg: #{msg.to_s} to client #{@request[:client_id]} (session #{@request[:session_id]})"
       send_data(msg.to_s + CR)
     end
     
@@ -153,7 +160,6 @@ module Juggernaut
     
     def broadcast(bdy)
       msg = Juggernaut::Message.new(@current_msg_id += 1, bdy, self.signature)
-      @messages << msg if options[:store_messages]
       publish(msg)
     end
     
@@ -162,9 +168,7 @@ module Juggernaut
       # attempt would hook onto a new em instance. A client
       # usually dies through an unbind 
       @connected = false
-      @logout_timeout = Time::now + (options[:timeout] || 30)
-			@status = "DEAD: %s: Could potentially logout at %s" %
-				[ reason, @logout_timeout ]
+      @client.remove_connection(self) if @client
     end
     
     def alive?
@@ -200,25 +204,6 @@ module Juggernaut
     def remove_channels!(chan_names)
       chan_names.to_a.each do |chan_name|
         remove_channel!(chan_name)
-      end
-    end
-    
-    def broadcast_all_messages_from(msg_id, signature_id)
-      return unless msg_id or signature_id
-      client = Juggernaut::Client.find_by_signature(signature)
-      return if !client
-      msg_id = Integer(msg_id)
-      return if msg_id >= client.current_msg_id
-      client.messages.select {|msg| 
-        (msg_id..client.current_msg_id).include?(msg.id)
-      }.each {|msg| publish(msg) }
-    end
-    
-    # todo - how should this be called - if at all?
-    def clean_up_old_messages(how_many_to_keep = 1000)
-      while @messages.length > how_many_to_keep
-        # We need to shift, as we want to remove the oldest first
-        @messages.shift
       end
     end
     
@@ -262,6 +247,13 @@ module Juggernaut
               client = Juggernaut::Client.find_by_id(client_id)
               client.remove_channels!(@request[:channels]) if client
             end
+          when :show_channels_for_client
+            query_needs :client_id
+            if client = Juggernaut::Client.find_by_id(@request[:client_id])
+              publish client.channels.to_json
+            else
+              publish nil.to_json
+            end
           when :show_clients
             if @request[:client_ids] and @request[:client_ids].any?
               clients = @request[:client_ids].collect{ |client_id| Client.find_by_id(client_id) }.compact.uniq
@@ -280,7 +272,13 @@ module Juggernaut
         end
       end
     
-      def subscribe_command        
+      def noop_command
+        logger.debug "NOOP"
+      end
+    
+      def subscribe_command
+        logger.debug "SUBSCRIBE: #{@request.inspect}"
+        
         if channels = @request[:channels]
           add_channels(channels)
         end
@@ -291,10 +289,8 @@ module Juggernaut
           raise UnauthorisedSubscription, @client
         end
         
-        Juggernaut::Client.add_client(@client)
-        
         if options[:store_messages]
-          broadcast_all_messages_from(@request[:last_msg_id], @request[:signature])
+          @client.send_queued_messages(self)
         end
       end
     
@@ -366,7 +362,7 @@ module Juggernaut
       end
       
       def client_ip
-        Socket.unpack_sockaddr_in(get_peername)[1]
+        Socket.unpack_sockaddr_in(get_peername)[1] rescue nil
       end
   end
 end
