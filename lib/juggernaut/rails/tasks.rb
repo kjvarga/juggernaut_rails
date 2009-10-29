@@ -59,6 +59,7 @@ namespace :juggernaut do
     extra_options << '-e' if Rails.env.development?
     FileUtils.cd(Rails.root) do
       command = ['juggernaut', '-c', defaults[:config_path], '-P', defaults[:pid_path], '-l', defaults[:log_path]] + extra_options
+      ENV['RAILS_ENV'] = Rails.env.to_s
       system(Escape.shell_command(command))
     end
   end

@@ -36,7 +36,7 @@ module Juggernaut
       end
       
       config_options = YAML::load(ERB.new(IO.read(config_path)).result)
-      config_options = config_options[::Rails.env] if config_options.has_key?(::Rails.env)
+      config_options = config_options[ENV['RAILS_ENV']] if config_options.has_key?(ENV['RAILS_ENV'])
       options.merge!(config_options)
       
       if options.include?(:kill)
