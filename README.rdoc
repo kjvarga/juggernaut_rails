@@ -23,7 +23,7 @@ Install the gem
 Now add the gem to your application and include Juggernaut's Rake tasks in your app's Rakefile:
 
   # config/environment.rb
-  config.gem 'juggernaut_rails', :lib => 'juggernaut'
+  config.gem 'juggernaut_rails'
 
   # Rakefile
   begin
