@@ -6,14 +6,25 @@ development:
   :allowed_ips: 
               - 127.0.0.1
   :port: 5001
-  # :store_messages: true
-  # :secret_key: your_secret_key_here
-  # :log_path: log/juggernaut.log
-  # :pid_path: tmp/pids/juggernaut.5001.pid
-  # :debug: false
-  # :host: 0.0.0.0
-  # :public_port: 5001
-  # :timeout: 10
+production:
+  :allowed_ips: 
+              - 127.0.0.1
+  :port: 5001
+test:
+  :allowed_ips: 
+              - 127.0.0.1
+  :port: 5001
+
+# Common options:  
+#
+# :store_messages: true
+# :secret_key: your_secret_key_here
+# :log_path: log/juggernaut.log # Default
+# :pid_path: tmp/pids/juggernaut.5001.pid # Default
+# :debug: true # Automatically turned on in development
+# :host: 0.0.0.0
+# :public_port: 5001
+# :timeout: 10
   
 # ======================
 # Juggernaut Options
