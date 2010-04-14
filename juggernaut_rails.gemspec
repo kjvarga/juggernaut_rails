@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{juggernaut_rails}
-  s.version = "0.5.9"
+  s.version = "0.6.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Alex MacCaw"]
-  s.date = %q{2009-10-30}
+  s.date = %q{2010-04-13}
   s.default_executable = %q{juggernaut}
   s.description = %q{      The Juggernaut Gem for Ruby on Rails aims to revolutionize your Rails app by letting the server initiate a connection and push data to the client. In other words your app can have a real time connection to the server with the advantage of instant updates. Although the obvious use of this is for chat, the most exciting prospect for me is collaborative cms and wikis.
       
