@@ -5,14 +5,14 @@
 
 Gem::Specification.new do |s|
   s.name = %q{juggernaut_rails}
-  s.version = "0.6.0"
+  s.version = "0.6.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Alex MacCaw"]
-  s.date = %q{2010-04-13}
+  s.date = %q{2010-05-10}
   s.default_executable = %q{juggernaut}
   s.description = %q{      The Juggernaut Gem for Ruby on Rails aims to revolutionize your Rails app by letting the server initiate a connection and push data to the client. In other words your app can have a real time connection to the server with the advantage of instant updates. Although the obvious use of this is for chat, the most exciting prospect for me is collaborative cms and wikis.
-      
+
       This Gem bundles Alex MacCaw's Juggernaut Gem and Rails plugin into one, and extends its Rails intergration for a simpler install and setup.
 }
   s.email = %q{info@eribium.org}
@@ -49,7 +49,6 @@ Gem::Specification.new do |s|
      "media/juggernaut_hosts.yml",
      "media/log/juggernaut.log",
      "media/swfobject.js",
-     "rails/init.rb",
      "rails/init.rb",
      "test/test_client.rb",
      "test/test_juggernaut.rb",
