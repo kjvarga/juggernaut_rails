@@ -5,14 +5,14 @@
 
 Gem::Specification.new do |s|
   s.name = %q{juggernaut_rails}
-  s.version = "0.6.1"
+  s.version = "0.6.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Alex MacCaw"]
   s.date = %q{2010-05-10}
   s.default_executable = %q{juggernaut}
   s.description = %q{      The Juggernaut Gem for Ruby on Rails aims to revolutionize your Rails app by letting the server initiate a connection and push data to the client. In other words your app can have a real time connection to the server with the advantage of instant updates. Although the obvious use of this is for chat, the most exciting prospect for me is collaborative cms and wikis.
-      
+
       This Gem bundles Alex MacCaw's Juggernaut Gem and Rails plugin into one, and extends its Rails intergration for a simpler install and setup.
 }
   s.email = %q{info@eribium.org}
@@ -79,13 +79,16 @@ Gem::Specification.new do |s|
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<eventmachine>, [">= 0.10.0"])
       s.add_runtime_dependency(%q<json>, [">= 1.1.2"])
+      s.add_runtime_dependency(%q<escape>, [">= 0"])
     else
       s.add_dependency(%q<eventmachine>, [">= 0.10.0"])
       s.add_dependency(%q<json>, [">= 1.1.2"])
+      s.add_dependency(%q<escape>, [">= 0"])
     end
   else
     s.add_dependency(%q<eventmachine>, [">= 0.10.0"])
     s.add_dependency(%q<json>, [">= 1.1.2"])
+    s.add_dependency(%q<escape>, [">= 0"])
   end
 end
 
